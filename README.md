@@ -3,4 +3,4 @@
 
 Grupo:GTEC
 
-<p>Participantes: Vinicius Santos Tiberio, Luan Rocha, Lidiane Marques da Silva, Mikelly Letran Plaça de Oliveira ,Micaella Letran Plaça de Oliveira.</p>
+<p>Participantes: Vinícius Santos Tiéerio, Luan Rocha, Lidiane Marques da Silva, Mikelly Letran Plaça de Oliveira ,Micaella Letran Plaça de Oliveira.</p>
