@@ -11,4 +11,11 @@
 
 <hr>
 <h1 align="center">Irrigação de telhados verdes</h1>
-<p> 🛠 Tecnologias</p>
+<p>🛠 Tecnologias</p>
+<ul>
+  <li>HTML5</li>
+  <li>CSS3</li>
+  <li>MongoDB</li>
+  <li>PHP 8.3</li>
+  <li>JavaScript</li>
+</ul>
