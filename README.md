@@ -1,6 +1,6 @@
 <h1>PI03 Cidade Inteligentes</h1>
 <h3>Projeto Interdisciplinar 03 Cidades Inteligentes</h3> 
-<p>Participantes</p>
+<p>Participantes:</p>
 <ul>
   <li>Vinícius Santos Tibério</li>
   <li>Luan Rocha</li>
