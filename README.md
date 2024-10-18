@@ -7,6 +7,7 @@
   <li>Lidiane Marques da Silva</li>
   <li>Mikelly Letran Plaça de Oliveira</li>
   <li>Micaella Letran Plaça de Oliveira</li>
+  <li>José Victor Dias Rodrigues</li>
 </ul>
 
 <hr>
@@ -18,4 +19,9 @@
   <li>MongoDB</li>
   <li>PHP 8.3</li>
   <li>JavaScript</li>
+</ul>
+
+<h2>Ferramentas de Organização</h2>
+<ul>
+  <li>Trelo: Kanban do Projeto https://trello.com/b/Iawcvsdz/sistema-de-irriga%C3%A7%C3%A3o</li>
 </ul>
