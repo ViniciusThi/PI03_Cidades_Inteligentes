@@ -1,0 +1,63 @@
+mkdir sistema-irrigacao
+cd sistema-irrigacao
+npm init -y
+npm install express mongoose bcryptjs jsonwebtoken cors dotenv
+npm install --save-dev nodemon 
+npm install node-fetch@2
+npm install socket.io
+npm run dev
+mkdir public
+cd public
+mkdir css js images
+touch index.html register.html dashboard.html programacao.html equipamento.html
+cd css
+touch style.css
+cd ../js
+touch auth.js dashboard.js programacao.js equipamento.js
+
+# Verificar se o MongoDB está rodando
+mongosh
+
+# No shell do MongoDB:
+use PI03
+db.createCollection('users')
+db.createCollection('sensordata')
+db.createCollection('programacao')
+
+# Certifique-se de estar na pasta raiz do projeto
+cd C:\xampp\htdocs\PiCidadesInteligentes
+
+# Inicie o servidor novamente
+npm run dev
+
+# No Windows, abra o cmd e digite:
+ping 192.168.102.28
+
+# Parar o servidor atual (se estiver rodando)
+# Pressione Ctrl+C
+
+# Instalar todas as dependências novamente
+npm install
+
+# Iniciar o servidor
+npm run dev
+
+# Executar o script de população dos timers
+node scripts/populateTimers.js
+
+# Parar o servidor se estiver rodando
+# Remover node_modules e package-lock.json
+rm -rf node_modules package-lock.json
+
+# Limpar cache do npm
+npm cache clean --force
+
+# Reinstalar dependências
+npm install
+
+# Iniciar o MongoDB (se não estiver rodando)
+# No Windows:
+net start MongoDB
+
+# Iniciar o servidor
+npm run dev

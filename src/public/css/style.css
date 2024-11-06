@@ -1,0 +1,251 @@
+:root {
+    --primary-color: #2ecc71;
+    --primary-dark: #27ae60;
+    --secondary-color: #e8f5e9;
+    --text-color: #2c3e50;
+    --light-green: #c8e6c9;
+    --success-color: #4caf50;
+    --danger-color: #e74c3c;
+}
+
+body {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: var(--primary-color) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255,255,255,.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: white !important;
+    background-color: var(--primary-dark);
+    border-radius: 5px;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,.1);
+    margin-bottom: 1.5rem;
+    background-color: white;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    color: var(--primary-dark);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Button Styling */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+}
+
+/* Form Controls */
+.form-control {
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+/* Status Indicators */
+.status-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #95a5a6;
+}
+
+.status-indicator.active {
+    background-color: var(--success-color);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.status-indicator.inactive {
+    background-color: var(--danger-color);
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+/* Dashboard Numbers */
+#umidadeSolo, #economiaAgua {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    margin: 1rem 0;
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--primary-dark);
+    border-bottom: 2px solid var(--light-green);
+}
+
+.table td {
+    vertical-align: middle;
+    color: var(--text-color);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    #umidadeSolo, #economiaAgua {
+        font-size: 2.2rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.3rem;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos específicos para a página de equipamento */
+.btn-group {
+    gap: 10px;
+}
+
+.btn-group .btn {
+    border-radius: 8px !important;
+}
+
+#btnDesconectar {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+#btnDesconectar:hover {
+    background-color: #c0392b;
+}
+
+.table td i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+/* Melhorar visualização dos botões desabilitados */
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Animação para o status indicator */
+.status-indicator {
+    transition: all 0.3s ease;
+}
+
+.status-indicator.active {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
+}
