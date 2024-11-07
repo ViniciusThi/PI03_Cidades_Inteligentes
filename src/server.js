@@ -7,6 +7,7 @@ const socketIo = require('socket.io');
 const User = require('./models/User');
 const SensorData = require('./models/SensorData');
 const auth = require('./middleware/auth');
+const userRoutes = require('./routes/user');
 require('dotenv').config();
 
 const app = express();
@@ -40,6 +41,7 @@ io.on('connection', (socket) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/sensor', require('./routes/sensor'));
 app.use('/api/programacao', require('./routes/programacao'));
+app.use('/api/user', userRoutes);
 
 // Rotas do Arduino
 app.post('/arduino/vincular', auth, async (req, res) => {

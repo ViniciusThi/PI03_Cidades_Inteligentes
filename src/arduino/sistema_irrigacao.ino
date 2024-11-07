@@ -3,10 +3,9 @@
 
 // Configurações de rede (IP Fixo)
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 102, 28);        // IP fixo do Arduino
-IPAddress gateway(192, 168, 102, 1);     // Gateway da sua rede
-IPAddress subnet(255, 255, 255, 0);      // Máscara de sub-rede
-IPAddress dns(192, 168, 0, 119);         // DNS
+IPAddress ip(192, 168, 0, 111);        // IP fixo do Arduino
+IPAddress gateway(192, 168, 0, 1);     // Gateway da sua rede
+IPAddress subnet(255, 255, 255, 0);      // Máscara de sub-rede        // DNS
 EthernetServer server(80);
 
 // Pinos
@@ -51,7 +50,7 @@ void setup() {
 
 void inicializarRede() {
     Serial.println("Configurando rede com IP fixo...");
-    Ethernet.begin(mac, ip, dns, gateway, subnet);
+    Ethernet.begin(mac, ip, gateway, subnet);
     delay(2000); // Aguardar estabilização
 
     if (Ethernet.hardwareStatus() == EthernetNoHardware) {

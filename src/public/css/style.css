@@ -249,3 +249,139 @@ body {
         box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
     }
 }
+
+.password-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.password-toggle:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.interactive-icon {
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.interactive-icon:hover {
+    transform: scale(1.1);
+    color: #198754;
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+    opacity: 0.6;
+}
+
+.form-control:focus::placeholder {
+    opacity: 0.4;
+}
+
+/* Estilo para o container da senha */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Estilo para o botão de toggle da senha */
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #6c757d;
+    padding: 0.375rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+}
+
+.password-toggle:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Ajuste no input de senha */
+.password-container input {
+    padding-right: 40px;
+}
+
+/* Ícones do Dashboard */
+.dashboard-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    transition: all 0.3s ease;
+}
+
+.dashboard-icon-sm {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Cores específicas para cada ícone */
+.text-primary .dashboard-icon {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.text-info .dashboard-icon {
+    background-color: rgba(13, 202, 240, 0.1);
+}
+
+.text-success .dashboard-icon {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.text-warning .dashboard-icon {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+/* Hover effects */
+.dashboard-icon:hover,
+.dashboard-icon-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .dashboard-icon {
+        font-size: 2rem;
+        width: 50px;
+        height: 50px;
+    }
+
+    .dashboard-icon-sm {
+        font-size: 1.2rem;
+        width: 35px;
+        height: 35px;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}

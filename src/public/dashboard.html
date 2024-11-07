@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Sistema de Irrigação Inteligente</title>
+    <title>Dashboard - GreenSystem</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -20,7 +20,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <i class="bi bi-droplet-fill me-2"></i>
-                Sistema de Irrigação
+                GreenSystem
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -52,10 +52,15 @@
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Status do Sistema</h5>
-                        <div class="d-flex align-items-center mt-3">
-                            <div id="statusIndicator" class="status-indicator"></div>
-                            <span id="statusText" class="ms-2">Carregando...</span>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-power text-primary dashboard-icon"></i>
+                            <div class="ms-3">
+                                <h5 class="card-title">Status do Sistema</h5>
+                                <div class="d-flex align-items-center">
+                                    <div id="statusIndicator" class="status-indicator"></div>
+                                    <span id="statusText" class="ms-2">Carregando...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -65,9 +70,14 @@
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Umidade do Solo</h5>
-                        <div class="text-center">
-                            <h2 id="umidadeSolo">---%</h2>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-moisture text-info dashboard-icon"></i>
+                            <div class="ms-3">
+                                <h5 class="card-title">Umidade do Solo</h5>
+                                <div class="text-center">
+                                    <h2 id="umidadeSolo" class="mb-0">---%</h2>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,10 +87,15 @@
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Economia de Água</h5>
-                        <div class="text-center">
-                            <h2 id="economiaAgua">---%</h2>
-                            <small>em relação ao mês anterior</small>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-droplet-half text-success dashboard-icon"></i>
+                            <div class="ms-3">
+                                <h5 class="card-title">Economia de Água</h5>
+                                <div>
+                                    <h2 id="economiaAgua" class="mb-0">---%</h2>
+                                    <small>em relação ao mês anterior</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,7 +107,10 @@
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Consumo de Água</h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-water text-primary dashboard-icon-sm"></i>
+                            <h5 class="card-title mb-0 ms-2">Consumo de Água</h5>
+                        </div>
                         <canvas id="waterChart"></canvas>
                     </div>
                 </div>
@@ -102,7 +120,10 @@
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Consumo de Energia</h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-lightning-charge text-warning dashboard-icon-sm"></i>
+                            <h5 class="card-title mb-0 ms-2">Consumo de Energia</h5>
+                        </div>
                         <canvas id="energyChart"></canvas>
                     </div>
                 </div>
