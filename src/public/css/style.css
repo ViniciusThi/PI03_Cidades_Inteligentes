@@ -1,6 +1,6 @@
 :root {
-    --bg-site:#BBF680;
     --bg-itens-gs: #EEFFDD;
+    --font-color: #4d9109;
     --primary-color: #82D72D;
     --primary-dark: #66af1d;
     --secondary-color: #e8f5e9;
@@ -11,37 +11,42 @@
 }
 
 body {
-    background-color: var(--bg-site);
+    background-image: linear-gradient(to bottom right, #bcff78, #649434) ;
+    
     color: var(--text-color);
     font-family: 'Roboto', sans-serif;
+    height: 100dvh;
 }
 
 /* Navbar Styling */
 .navbar {
-    background-color: var(--primary-color) !important;
+    background-color: var(--bg-itens-gs) !important;
     box-shadow: 0 2px 4px rgba(0,0,0,.1);
-    padding: 1rem 0;
+    padding: 5px 0;
 }
 
 .navbar-brand {
     font-weight: 700;
-    font-size: 1.5rem;
-    color: white !important;
+    font-size: 12pt;
+    color: var(--font-color) !important; 
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: rgba(255,255,255,.9) !important;
+    color: var(--font-color) !important;
     font-weight: 500;
-    padding: 0.5rem 1rem;
+    padding: 2px 12px;
+    margin: 0 4px;
     transition: all 0.3s ease;
 }
 
+
 .navbar-dark .navbar-nav .nav-link:hover,
 .navbar-dark .navbar-nav .nav-link.active {
-    color: white !important;
+    color: #f5ffec !important;
     background-color: var(--primary-dark);
-    border-radius: 5px;
-}
+    border-radius: 8px;
+} 
+
 
 /* Card Styling */
 .card {
@@ -322,8 +327,10 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
-    transition: all 0.3s ease;
+    border: 1px solid #F4FFF9;
+    box-shadow: 0 0 4px #48771852;
+    background-color: #ffffff;
+    
 }
 
 .dashboard-icon-sm {
@@ -333,9 +340,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    border: 1px solid #F4FFF9;
+    box-shadow: 0 0 4px #48771852;
+    background-color: #ffffff;
+    
 }
 
 /* Cores específicas para cada ícone */
@@ -355,12 +364,7 @@ body {
     background-color: rgba(255, 193, 7, 0.1);
 }
 
-/* Hover effects */
-.dashboard-icon:hover,
-.dashboard-icon-sm:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+
 
 /* Responsividade */
 @media (max-width: 768px) {
@@ -406,9 +410,20 @@ nav {
     }
 }
 
+
+.nav-item {
+    color: var(--font-color);
+}
+
+
 .card {
     background: var(--bg-itens-gs);
     border-radius: 12px;
     border: 1px solid #F4FFF9;
     box-shadow: 0 0 4px #48771852;
+}
+
+
+.card-style {
+    min-height: 200px
 }
