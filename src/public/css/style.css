@@ -1,6 +1,8 @@
 :root {
-    --primary-color: #2ecc71;
-    --primary-dark: #27ae60;
+    --bg-site:#BBF680;
+    --bg-itens-gs: #EEFFDD;
+    --primary-color: #82D72D;
+    --primary-dark: #66af1d;
     --secondary-color: #e8f5e9;
     --text-color: #2c3e50;
     --light-green: #c8e6c9;
@@ -9,7 +11,7 @@
 }
 
 body {
-    background-color: var(--secondary-color);
+    background-color: var(--bg-site);
     color: var(--text-color);
     font-family: 'Roboto', sans-serif;
 }
@@ -51,9 +53,6 @@ body {
     transition: transform 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-}
 
 .card-body {
     padding: 2rem;
@@ -384,4 +383,32 @@ body {
     h2 {
         font-size: 1.5rem;
     }
+}
+
+
+/* JOSÉ */
+
+
+nav {
+    background: var(--bg-itens-gs);
+    font-size: 14pt;
+    height: 40px;
+    margin: 12px;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid #F4FFF9;
+    box-shadow: 0 0 4px #48771852;
+
+    & > p {
+        padding: 0;
+        padding-left: 16px;
+        margin: 0;
+    }
+}
+
+.card {
+    background: var(--bg-itens-gs);
+    border-radius: 12px;
+    border: 1px solid #F4FFF9;
+    box-shadow: 0 0 4px #48771852;
 }
