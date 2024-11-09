@@ -12,7 +12,8 @@
 
 body {
     background-image: linear-gradient(to bottom right, #bcff78, #649434) ;
-    
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: var(--text-color);
     font-family: 'Roboto', sans-serif;
     height: 100dvh;
@@ -184,7 +185,7 @@ body {
     }
 
     .navbar-brand {
-        font-size: 1.3rem;
+        font-size: 1rem;
     }
 }
 
@@ -327,8 +328,8 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    border: 1px solid #F4FFF9;
-    box-shadow: 0 0 4px #48771852;
+    border: 1px solid #f9fffc;
+    box-shadow: 0 0 3px #48771852;
     background-color: #ffffff;
     
 }
@@ -396,9 +397,8 @@ body {
 nav {
     background: var(--bg-itens-gs);
     font-size: 14pt;
-    height: 40px;
+    height: 44px;
     margin: 12px;
-    padding: 6px;
     border-radius: 12px;
     border: 1px solid #F4FFF9;
     box-shadow: 0 0 4px #48771852;
@@ -408,6 +408,9 @@ nav {
         padding-left: 16px;
         margin: 0;
     }
+
+    position: relative;
+    z-index: 1000;
 }
 
 
@@ -426,4 +429,39 @@ nav {
 
 .card-style {
     min-height: 200px
+}
+
+
+.on-off {
+    padding: 16px;
+}
+
+
+.navbar-toggler {
+    padding: 0;
+    margin-bottom: 4px;
+}
+
+
+.bi-list {
+    color: #032c04;
+}
+
+
+.navbar-toggler-icon {
+    width: 24px;
+    height: 24px;
+}
+
+
+.navbar-collapse {
+    background-color: var(--bg-itens-gs);
+    border-radius: 8px;
+    margin-top: 0;
+    z-index: 1001;
+}
+
+
+.nav-item {
+    margin: 6px 0;  
 }
