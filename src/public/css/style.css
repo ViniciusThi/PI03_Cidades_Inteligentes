@@ -224,8 +224,7 @@ body {
 }
 
 .table td i {
-    margin-right: 8px;
-    color: var(--primary-color);
+    color: black;
 }
 
 /* Melhorar visualização dos botões desabilitados */

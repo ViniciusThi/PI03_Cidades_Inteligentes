@@ -78,7 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: document.getElementById('email').value,
                 telefone: document.getElementById('telefone').value,
                 senha: senha,
-                tipoTelhado: document.getElementById('tipoTelhado').value
+                tipoTelhado: document.getElementById('tipoTelhado').value,
+                cep: document.getElementById('cep').value,
+                numero: document.getElementById('numero').value
             };
 
             try {
@@ -137,8 +139,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Limpar qualquer token ou status anterior
+                    localStorage.clear();
+                    
+                    // Salvar novos dados
                     localStorage.setItem('token', data.token);
-                    window.location.href = 'dashboard.html';
+                    localStorage.setItem('isAdmin', data.isAdmin ? '1' : '0');
+
+                    console.log('Login successful, isAdmin:', data.isAdmin);
+
+                    // Redirecionar uma única vez
+                    if (data.isAdmin) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
                 } else {
                     throw new Error(data.msg || 'Erro ao fazer login');
                 }
@@ -150,5 +165,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
+    }
+
+    // Adicionar função para buscar endereço pelo CEP
+    function buscarEndereco(cep) {
+        const cepLimpo = cep.replace(/\D/g, '');
+        
+        if (cepLimpo.length !== 8) return;
+
+        fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.erro) {
+                    document.getElementById('rua').value = data.logradouro;
+                    document.getElementById('bairro').value = data.bairro;
+                    document.getElementById('cidade').value = data.localidade;
+                    document.getElementById('estado').value = data.uf;
+                    document.getElementById('numero').focus();
+                }
+            })
+            .catch(error => console.error('Erro ao buscar CEP:', error));
+    }
+
+    // Adicionar evento para o campo de CEP
+    const cepInput = document.getElementById('cep');
+    if (cepInput) {
+        cepInput.addEventListener('blur', () => buscarEndereco(cepInput.value));
     }
 }); 

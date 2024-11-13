@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Verificar se não é admin
+    const isAdmin = localStorage.getItem('isAdmin') === '1';
+    if (isAdmin) {
+        window.location.replace('admin.html');
+        return;
+    }
+
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = 'index.html';
@@ -141,9 +148,14 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarDados();
     setInterval(atualizarDados, 30000);
 
-    // Logout
-    document.getElementById('btnLogout').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.href = 'index.html';
-    });
+    // Adicionar evento de logout
+    const btnLogout = document.getElementById('btnLogout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            // Limpar todo o localStorage
+            localStorage.clear();
+            // Redirecionar para a página de login
+            window.location.href = 'index.html';
+        });
+    }
 }); 
