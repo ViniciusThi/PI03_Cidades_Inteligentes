@@ -1,8 +1,8 @@
 :root {
-    --bg-itens-gs: #EEFFDD;
-    --font-color: #4d9109;
-    --primary-color: #82D72D;
-    --primary-dark: #66af1d;
+    --bg-itens-gs: #fbfff7;
+    --font-color: #376b03;
+    --primary-color: #49df0d;
+    --primary-dark: #399e11;
     --secondary-color: #e8f5e9;
     --text-color: #2c3e50;
     --light-green: #c8e6c9;
@@ -11,7 +11,7 @@
 }
 
 body {
-    background-image: linear-gradient(to bottom right, #bcff78, #649434) ;
+    background-image: linear-gradient(to bottom right, #8cdd3b, #277e24) ;
     background-attachment: fixed;
     background-repeat: no-repeat;
     color: var(--text-color);
