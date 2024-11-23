@@ -1,0 +1,26 @@
+Descrição do fluxo de eventos
+
+1. O usuário insere os dados de cadastro
+2. Fazer o login
+3. O usuário é redirecionado para a página inicial da sua conta
+4. Na página inicial o usuário vê informações sobre o seu sistema
+5. Na a página de equipamentos pode ser configurado algumas opções dos equipamentos de irrigação
+6. Na página de programação configurar horários de irrigação e ativar/desativar sistema
+
+2a. Dados de login incorretos:
+2a.1 Usuário é alertado que seus dados de login estão incorretos
+
+5a Configurar arduino:
+5a.1 Adicionar o IP:Porta do arduino
+5a.2 Conectar com o arduino
+5a.3 Testar conexão
+
+5b Irrigar manualmente:
+5b.1 Ligar sistema
+5b.2 Desligar sistema
+
+6a. Ativar ou desativar o sistema:
+
+6b. Programar horários de irrigação:
+6b.1 Deletar horários pre-configurados (opcional)
+6b.2 Adicionar novos horários.
