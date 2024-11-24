@@ -9,12 +9,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const novaProgramacaoForm = document.getElementById('novaProgramacaoForm');
     const sistemaAtivo = document.getElementById('sistemaAtivo');
 
-    // Carregar estado do sistema
-    sistemaAtivo.checked = localStorage.getItem('sistemaIrrigacaoAtivo') === 'true';
+    // Carregar estado inicial do switch
+    async function carregarEstadoSistema() {
+        try {
+            const response = await fetch('/arduino/estado', {
+                headers: {
+                    'x-auth-token': token
+                }
+            });
 
-    // Evento para salvar estado do sistema
-    sistemaAtivo.addEventListener('change', (e) => {
-        localStorage.setItem('sistemaIrrigacaoAtivo', e.target.checked);
+            if (response.ok) {
+                const data = await response.json();
+                sistemaAtivo.checked = data.sistemaAutomatico;
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estado do sistema:', error);
+        }
+    }
+
+    // Evento do switch
+    sistemaAtivo.addEventListener('change', async (e) => {
+        try {
+            const response = await fetch('/arduino/sistema-automatico', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token
+                },
+                body: JSON.stringify({
+                    ativo: e.target.checked
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao atualizar estado do sistema');
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso',
+                text: `Sistema automático ${e.target.checked ? 'ativado' : 'desativado'}!`,
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error('Erro:', error);
+            e.target.checked = !e.target.checked; // Reverter estado do switch
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Erro ao atualizar estado do sistema'
+            });
+        }
     });
 
     // Carregar programações padrão
@@ -242,4 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         window.location.href = 'index.html';
     });
+
+    // Carregar estado inicial
+    carregarEstadoSistema();
 }); 

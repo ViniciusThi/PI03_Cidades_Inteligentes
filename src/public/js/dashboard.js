@@ -16,22 +16,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const waterCtx = document.getElementById('waterChart').getContext('2d');
     const energyCtx = document.getElementById('energyChart').getContext('2d');
 
+    // Dados fictícios
+    const ultimosSeteDias = Array.from({length: 7}, (_, i) => {
+        const data = new Date();
+        data.setDate(data.getDate() - i);
+        return data.toLocaleDateString();
+    }).reverse();
+
+    // Dados fictícios de consumo de água
+    const consumoAgua = [120, 115, 125, 110, 130, 120, 115];
+    
+    // Dados fictícios de consumo de energia
+    const consumoEnergia = [2.5, 2.3, 2.6, 2.4, 2.7, 2.5, 2.4];
+
     const waterChart = new Chart(waterCtx, {
         type: 'line',
         data: {
-            labels: [],
+            labels: ultimosSeteDias,
             datasets: [{
                 label: 'Consumo de Água (L)',
-                data: [],
+                data: consumoAgua,
                 borderColor: '#0d6efd',
-                tension: 0.1
+                tension: 0.1,
+                fill: false
             }]
         },
         options: {
             responsive: true,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Litros'
+                    }
                 }
             }
         }
@@ -40,122 +58,113 @@ document.addEventListener('DOMContentLoaded', () => {
     const energyChart = new Chart(energyCtx, {
         type: 'line',
         data: {
-            labels: [],
+            labels: ultimosSeteDias,
             datasets: [{
                 label: 'Consumo de Energia (kWh)',
-                data: [],
+                data: consumoEnergia,
                 borderColor: '#198754',
-                tension: 0.1
+                tension: 0.1,
+                fill: false
             }]
         },
         options: {
             responsive: true,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'kWh'
+                    }
                 }
             }
         }
     });
 
-    // Adicionar após a configuração dos gráficos
-    const socket = io();
+    // Função para atualizar dados fictícios
+    function atualizarDadosFicticios() {
+        // Umidade do solo (valor entre 60% e 80%)
+        const umidade = Math.floor(Math.random() * (80 - 60 + 1)) + 60;
+        document.getElementById('umidadeSolo').textContent = `${umidade}%`;
 
-    socket.on('sensorUpdate', (data) => {
-        if (data.userId === getUserId()) { // Implementar função para pegar ID do usuário do token
-            atualizarDadosInterface(data.data);
-        }
-    });
+        // Economia de água (valor entre 15% e 25%)
+        const economia = Math.floor(Math.random() * (25 - 15 + 1)) + 15;
+        document.getElementById('economiaAgua').textContent = `${economia}%`;
 
-    function atualizarDadosInterface(dados) {
-        document.getElementById('umidadeSolo').textContent = `${dados.umidadeSolo}%`;
+        // Atualizar gráficos com novos valores
+        const novoConsumoAgua = consumoAgua[consumoAgua.length - 1] + (Math.random() * 10 - 5);
+        const novoConsumoEnergia = consumoEnergia[consumoEnergia.length - 1] + (Math.random() * 0.4 - 0.2);
+
+        // Remover primeiro valor e adicionar novo
+        waterChart.data.datasets[0].data.shift();
+        waterChart.data.datasets[0].data.push(novoConsumoAgua);
         
+        energyChart.data.datasets[0].data.shift();
+        energyChart.data.datasets[0].data.push(novoConsumoEnergia);
+
+        // Atualizar data
+        const novaData = new Date();
+        novaData.setDate(new Date(waterChart.data.labels[waterChart.data.labels.length - 1]).getDate() + 1);
+        
+        waterChart.data.labels.shift();
+        waterChart.data.labels.push(novaData.toLocaleDateString());
+        
+        energyChart.data.labels.shift();
+        energyChart.data.labels.push(novaData.toLocaleDateString());
+
         // Atualizar gráficos
-        const timestamp = new Date(dados.timestamp).toLocaleTimeString();
-        
-        waterChart.data.labels.push(timestamp);
-        waterChart.data.datasets[0].data.push(dados.consumoAgua);
-        if (waterChart.data.labels.length > 10) {
-            waterChart.data.labels.shift();
-            waterChart.data.datasets[0].data.shift();
-        }
         waterChart.update();
-
-        energyChart.data.labels.push(timestamp);
-        energyChart.data.datasets[0].data.push(dados.consumoEnergia);
-        if (energyChart.data.labels.length > 10) {
-            energyChart.data.labels.shift();
-            energyChart.data.datasets[0].data.shift();
-        }
         energyChart.update();
     }
 
-    // Função para atualizar os dados
-    async function atualizarDados() {
-        try {
-            const response = await fetch('/api/sensor', {
-                headers: {
-                    'x-auth-token': token
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao buscar dados');
-            }
-
-            const dados = await response.json();
-            
-            // Atualizar umidade do solo
-            if (dados.length > 0) {
-                const ultimaLeitura = dados[0];
-                document.getElementById('umidadeSolo').textContent = 
-                    `${ultimaLeitura.umidadeSolo}%`;
-            }
-
-            // Preparar dados para os gráficos
-            const labels = dados.map(d => new Date(d.timestamp).toLocaleDateString());
-            const consumoAgua = dados.map(d => d.consumoAgua);
-            const consumoEnergia = dados.map(d => d.consumoEnergia);
-
-            // Atualizar gráficos
-            waterChart.data.labels = labels.reverse();
-            waterChart.data.datasets[0].data = consumoAgua.reverse();
-            waterChart.update();
-
-            energyChart.data.labels = labels;
-            energyChart.data.datasets[0].data = consumoEnergia;
-            energyChart.update();
-
-            // Calcular economia de água
-            if (dados.length > 1) {
-                const consumoAtual = consumoAgua[0];
-                const consumoAnterior = consumoAgua[1];
-                const economia = ((consumoAnterior - consumoAtual) / consumoAnterior * 100).toFixed(1);
-                document.getElementById('economiaAgua').textContent = `${economia}%`;
-            }
-
-        } catch (error) {
-            console.error('Erro:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro',
-                text: 'Erro ao atualizar dados'
-            });
-        }
-    }
-
     // Atualizar dados a cada 30 segundos
-    atualizarDados();
-    setInterval(atualizarDados, 30000);
+    atualizarDadosFicticios();
+    setInterval(atualizarDadosFicticios, 30000);
 
     // Adicionar evento de logout
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
-            // Limpar todo o localStorage
             localStorage.clear();
-            // Redirecionar para a página de login
             window.location.href = 'index.html';
         });
     }
+
+    // Função para atualizar status do sistema
+    async function atualizarStatusSistema() {
+        try {
+            const response = await fetch('/arduino/status', {
+                headers: {
+                    'x-auth-token': localStorage.getItem('token')
+                }
+            });
+
+            if (!response.ok) throw new Error('Erro ao buscar status');
+
+            const data = await response.json();
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+
+            // Atualizar indicador visual
+            statusIndicator.className = 'status-indicator';
+            switch (data.status) {
+                case 'online':
+                    statusIndicator.classList.add('status-active');
+                    statusText.textContent = 'Online';
+                    break;
+                case 'irrigando':
+                    statusIndicator.classList.add('status-irrigating');
+                    statusText.textContent = 'Irrigando';
+                    break;
+                default:
+                    statusIndicator.classList.add('status-inactive');
+                    statusText.textContent = 'Desconectado';
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar status:', error);
+        }
+    }
+
+    // Atualizar status a cada 5 segundos
+    setInterval(atualizarStatusSistema, 5000);
 }); 

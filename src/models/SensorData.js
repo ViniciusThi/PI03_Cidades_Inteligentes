@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const sensorDataSchema = new mongoose.Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true
     },
     umidadeSolo: {

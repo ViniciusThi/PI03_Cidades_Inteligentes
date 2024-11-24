@@ -29,6 +29,7 @@ async function populateTimers() {
 
         // Limpar timers existentes
         await TimerPadrao.deleteMany({});
+        console.log('Timers antigos removidos');
 
         // Inserir novos timers
         for (const [tipo, horarios] of Object.entries(timersData)) {
@@ -36,6 +37,7 @@ async function populateTimers() {
                 tipoTelhado: tipo,
                 horarios: horarios
             });
+            console.log(`Timers para telhado ${tipo} criados`);
         }
 
         console.log('Timers padrão populados com sucesso!');

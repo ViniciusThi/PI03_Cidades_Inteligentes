@@ -86,18 +86,33 @@ function atualizarTabelaClientes(clientes) {
             <td>${cliente.rua}, ${cliente.numero} - ${cliente.cidade}/${cliente.estado}</td>
             <td>${cliente.tipoTelhado}</td>
             <td>
-                <span class="status-indicator ${cliente.sistemaAtivo ? 'status-active' : 'status-inactive'}"></span>
-                ${cliente.sistemaAtivo ? 'Ativo' : 'Inativo'}
+                <span class="status-indicator ${cliente.equipamentoConectado ? 'status-active' : 'status-inactive'}"></span>
+                ${cliente.equipamentoConectado ? 'Conectado' : 'Desconectado'}
+            </td>
+            <td>
+                <span class="status-indicator ${getStatusClass(cliente.status)}"></span>
+                ${cliente.status}
             </td>
             <td>${ultimaAtividade}</td>
             <td>
-                <button class="btn btn-sm btn-primary btn-estilo" onclick="verDetalhes(${cliente.id})">
+                <button class="btn btn-sm btn-info" onclick="verDetalhes(${cliente.id})">
                     <i class="bi bi-eye"></i>
                 </button>
             </td>
         `;
         tbody.appendChild(row);
     });
+}
+
+function getStatusClass(status) {
+    switch(status) {
+        case 'online':
+            return 'status-active';
+        case 'irrigando':
+            return 'status-irrigating';
+        default:
+            return 'status-inactive';
+    }
 }
 
 // Atualizar marcadores no mapa
