@@ -79,7 +79,9 @@ exports.carregarTimersPadrao = async (req, res) => {
         try {
             // Buscar tipo de telhado do usuário
             const [users] = await connection.execute(
-                'SELECT tipoTelhado FROM users WHERE id = ?',
+                'SELECT tt.nome as tipo_telhado FROM usuarios u ' +
+                'JOIN tipos_telhado tt ON u.tipo_telhado_id = tt.id ' +
+                'WHERE u.id = ?',
                 [req.user.id]
             );
 
@@ -87,12 +89,12 @@ exports.carregarTimersPadrao = async (req, res) => {
                 return res.status(404).json({ msg: 'Usuário não encontrado' });
             }
 
-            const tipoTelhado = users[0].tipoTelhado.toLowerCase();
-            console.log('Tipo de telhado:', tipoTelhado); // Debug
+            const tipoTelhado = users[0].tipo_telhado.toLowerCase();
+            console.log('Tipo de telhado do usuário:', tipoTelhado);
 
             // Buscar timers padrão do MongoDB
             const timersPadrao = await TimerPadrao.findOne({ tipoTelhado });
-            console.log('Timers padrão encontrados:', timersPadrao); // Debug
+            console.log('Timers padrão encontrados:', timersPadrao);
 
             if (!timersPadrao) {
                 return res.status(404).json({ msg: 'Timers padrão não encontrados' });
@@ -111,7 +113,7 @@ exports.carregarTimersPadrao = async (req, res) => {
                 }).save();
             }));
 
-            console.log('Novas programações criadas:', programacoes); // Debug
+            console.log('Novas programações criadas:', programacoes);
             res.json(programacoes);
 
         } finally {

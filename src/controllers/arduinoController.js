@@ -5,26 +5,18 @@ const Programacao = require('../models/Programacao');
 
 exports.vincularArduino = async (req, res) => {
     try {
-        const ip = '192.168.185.208';
-        const port = '80';
         const connection = await pool.getConnection();
 
         try {
-            // Atualizar dados do Arduino no banco
+            // Inserir ou atualizar configuração do Arduino
             await connection.execute(
-                'UPDATE users SET arduinoIp = ?, arduinoPort = ? WHERE id = ?',
-                [ip, port, req.user.id]
-            );
-
-            // Criar ou atualizar estado no MongoDB
-            await RelayState.findOneAndUpdate(
-                { userId: req.user.id.toString() },
-                {
-                    estado: false,
-                    sistemaAutomatico: false,
-                    status: 'online'
-                },
-                { upsert: true, new: true }
+                `INSERT INTO arduino_config (usuario_id, ip, porta, ultimo_status) 
+                 VALUES (?, ?, ?, 'online')
+                 ON DUPLICATE KEY UPDATE 
+                 ip = VALUES(ip), 
+                 porta = VALUES(porta),
+                 ultimo_status = 'online'`,
+                [req.user.id, '192.168.185.208', '80']
             );
 
             res.json({ msg: 'Arduino vinculado com sucesso' });
@@ -42,13 +34,17 @@ exports.getStatus = async (req, res) => {
         const connection = await pool.getConnection();
         
         try {
+            // Atualizado de 'users' para 'usuarios'
             const [user] = await connection.execute(
-                'SELECT arduinoIp, arduinoPort FROM users WHERE id = ?',
+                'SELECT ac.ip as arduinoIp, ac.porta as arduinoPort ' +
+                'FROM usuarios u ' +
+                'LEFT JOIN arduino_config ac ON u.id = ac.usuario_id ' +
+                'WHERE u.id = ?',
                 [req.user.id]
             );
 
             // Verificar se o usuário tem um Arduino vinculado
-            const vinculado = Boolean(user[0].arduinoIp && user[0].arduinoPort);
+            const vinculado = Boolean(user[0]?.arduinoIp && user[0]?.arduinoPort);
 
             // Buscar último estado no MongoDB
             const ultimoEstado = await RelayState.findOne(
@@ -56,16 +52,6 @@ exports.getStatus = async (req, res) => {
                 {},
                 { sort: { timestamp: -1 } }
             );
-
-            // Se está vinculado mas não tem estado, criar um estado inicial
-            if (vinculado && !ultimoEstado) {
-                await new RelayState({
-                    userId: req.user.id.toString(),
-                    estado: false,
-                    sistemaAutomatico: false,
-                    status: 'online'
-                }).save();
-            }
 
             res.json({
                 vinculado,

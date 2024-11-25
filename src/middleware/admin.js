@@ -6,11 +6,11 @@ module.exports = async function(req, res, next) {
         
         try {
             const [user] = await connection.execute(
-                'SELECT isAdmin FROM users WHERE id = ?',
+                'SELECT is_admin FROM usuarios WHERE id = ?',
                 [req.user.id]
             );
 
-            if (user.length === 0 || !user[0].isAdmin) {
+            if (user.length === 0 || !user[0].is_admin) {
                 return res.status(403).json({ msg: 'Acesso negado' });
             }
 

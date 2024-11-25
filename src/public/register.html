@@ -87,14 +87,42 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Senha</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         <input type="password" class="form-control" id="senha" required>
+                                        <button type="button" class="password-toggle">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="password-requirements mt-2">
+                                        <div class="requirement" id="req-length">
+                                            <i class="bi bi-x-circle text-danger"></i>
+                                            <small>8 a 16 caracteres</small>
+                                        </div>
+                                        <div class="requirement" id="req-lowercase">
+                                            <i class="bi bi-x-circle text-danger"></i>
+                                            <small>Letra minúscula</small>
+                                        </div>
+                                        <div class="requirement" id="req-uppercase">
+                                            <i class="bi bi-x-circle text-danger"></i>
+                                            <small>Letra maiúscula</small>
+                                        </div>
+                                        <div class="requirement" id="req-number">
+                                            <i class="bi bi-x-circle text-danger"></i>
+                                            <small>Número</small>
+                                        </div>
+                                        <div class="requirement" id="req-special">
+                                            <i class="bi bi-x-circle text-danger"></i>
+                                            <small>Caractere especial (@$!%*?&)</small>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Confirmar Senha</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         <input type="password" class="form-control" id="confirmarSenha" required>
+                                        <button type="button" class="password-toggle">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
