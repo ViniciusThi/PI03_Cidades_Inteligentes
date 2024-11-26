@@ -21,9 +21,9 @@ Sistema web integrado com Arduino para automação de irrigação em telhados ve
 - Sistema automático baseado em sensores de umidade
 - Interface responsiva e moderna
 
-## Ferramentas de Organização
-- Trelo: Kanban do Projeto https://trello.com/b/Iawcvsdz/sistema-de-irriga%C3%A7%C3%A3o
-
+## Ferramentas
+- Trelo: [Kanban do projeto](https://trello.com/b/Iawcvsdz/sistema-de-irriga%C3%A7%C3%A3o)
+- Canvas: [Slides apresentação - GreenSystem](https://www.canva.com/design/DAGWfwGYtGU/E_X0rWK87MzV-wM1KVsrJQ/edit?utm_content=DAGWfwGYtGU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 ## Tecnologias Utilizadas
 
 ### Backend
