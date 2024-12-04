@@ -9,97 +9,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const novaProgramacaoForm = document.getElementById('novaProgramacaoForm');
     const sistemaAtivo = document.getElementById('sistemaAtivo');
 
-    // Carregar estado inicial do switch
-    async function carregarEstadoSistema() {
-        try {
-            const response = await fetch('/arduino/estado', {
-                headers: {
-                    'x-auth-token': token
+    // Função para configurar eventos dos switches
+    function setupSwitchEvents() {
+        document.querySelectorAll('.prog-status').forEach(switch_ => {
+            switch_.addEventListener('change', async (e) => {
+                const id = e.target.dataset.id;
+                const ativo = e.target.checked;
+
+                try {
+                    const response = await fetch(`/api/programacao/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-auth-token': token
+                        },
+                        body: JSON.stringify({ ativo })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Erro ao atualizar status');
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status atualizado!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } catch (error) {
+                    console.error('Erro:', error);
+                    e.target.checked = !ativo; // Reverter o switch
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: error.message
+                    });
                 }
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                sistemaAtivo.checked = data.sistemaAutomatico;
-            }
-        } catch (error) {
-            console.error('Erro ao carregar estado do sistema:', error);
-        }
-    }
-
-    // Evento do switch
-    sistemaAtivo.addEventListener('change', async (e) => {
-        try {
-            const response = await fetch('/arduino/sistema-automatico', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-auth-token': token
-                },
-                body: JSON.stringify({
-                    ativo: e.target.checked
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao atualizar estado do sistema');
-            }
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: `Sistema automático ${e.target.checked ? 'ativado' : 'desativado'}!`,
-                timer: 1500,
-                showConfirmButton: false
-            });
-        } catch (error) {
-            console.error('Erro:', error);
-            e.target.checked = !e.target.checked; // Reverter estado do switch
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro',
-                text: 'Erro ao atualizar estado do sistema'
-            });
-        }
-    });
-
-    // Carregar programações padrão
-    async function carregarProgramacoesPadrao() {
-        try {
-            const response = await fetch('/api/programacao/carregar-padrao', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-auth-token': token
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao carregar programações padrão');
-            }
-
-            await carregarProgramacoes();
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Programações padrão carregadas!',
-                text: 'As programações foram configuradas de acordo com seu tipo de telhado.'
-            });
-        } catch (error) {
-            console.error('Erro:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro',
-                text: error.message
-            });
-        }
-    }
-
-    // Verificar se é primeira vez e carregar programações padrão
-    const programacoesCarregadas = localStorage.getItem('programacoesCarregadas');
-    if (!programacoesCarregadas) {
-        carregarProgramacoesPadrao();
-        localStorage.setItem('programacoesCarregadas', 'true');
+        });
     }
 
     // Carregar programações
@@ -117,6 +64,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const programacoes = await response.json();
             programacaoTable.innerHTML = '';
+
+            if (programacoes.length === 0) {
+                // Mostrar mensagem de carregamento
+                Swal.fire({
+                    title: 'Carregando programações...',
+                    text: 'Configurando sua programação inicial baseada no seu tipo de telhado',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Recarregar após 2 segundos
+                setTimeout(carregarProgramacoes, 2000);
+                return;
+            }
 
             programacoes.forEach(prog => {
                 const row = document.createElement('tr');
@@ -138,43 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 programacaoTable.appendChild(row);
             });
 
-            // Adicionar eventos aos switches
-            document.querySelectorAll('.prog-status').forEach(switch_ => {
-                switch_.addEventListener('change', async (e) => {
-                    const id = e.target.dataset.id;
-                    const ativo = e.target.checked;
-
-                    try {
-                        const response = await fetch(`/api/programacao/${id}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'x-auth-token': token
-                            },
-                            body: JSON.stringify({ ativo })
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Erro ao atualizar status');
-                        }
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Status atualizado!',
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    } catch (error) {
-                        console.error('Erro:', error);
-                        e.target.checked = !ativo; // Reverter o switch
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro',
-                            text: error.message
-                        });
-                    }
-                });
-            });
+            // Configurar eventos dos switches
+            setupSwitchEvents();
         } catch (error) {
             console.error('Erro:', error);
             Swal.fire({
@@ -186,48 +114,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Adicionar nova programação
-    novaProgramacaoForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    if (novaProgramacaoForm) {
+        novaProgramacaoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        const formData = {
-            diaSemana: document.getElementById('diaSemana').value,
-            horario: document.getElementById('horario').value
-        };
+            const formData = {
+                diaSemana: document.getElementById('diaSemana').value,
+                horario: document.getElementById('horario').value
+            };
 
-        try {
-            const response = await fetch('/api/programacao', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-auth-token': token
-                },
-                body: JSON.stringify(formData)
-            });
+            try {
+                const response = await fetch('/api/programacao', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': token
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-            if (!response.ok) {
-                throw new Error('Erro ao adicionar programação');
+                if (!response.ok) {
+                    throw new Error('Erro ao adicionar programação');
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Programação adicionada!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                novaProgramacaoForm.reset();
+                carregarProgramacoes();
+            } catch (error) {
+                console.error('Erro:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: error.message
+                });
             }
+        });
+    }
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Programação adicionada!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-
-            novaProgramacaoForm.reset();
-            carregarProgramacoes();
-        } catch (error) {
-            console.error('Erro:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro',
-                text: error.message
-            });
-        }
-    });
-
-    // Função para deletar programação
+    // Função para deletar programação (precisa ser global)
     window.deletarProgramacao = async (id) => {
         try {
             const result = await Swal.fire({
@@ -273,22 +203,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carregar programações iniciais
     carregarProgramacoes();
-
-    // Logout com limpeza seletiva
-    document.getElementById('btnLogout').addEventListener('click', () => {
-        // Não limpar o estado do sistema de irrigação
-        const sistemaAtivo = localStorage.getItem('sistemaIrrigacaoAtivo');
-        const programacoesCarregadas = localStorage.getItem('programacoesCarregadas');
-        
-        localStorage.clear();
-        
-        // Restaurar estado do sistema
-        localStorage.setItem('sistemaIrrigacaoAtivo', sistemaAtivo);
-        localStorage.setItem('programacoesCarregadas', programacoesCarregadas);
-        
-        window.location.href = 'index.html';
-    });
-
-    // Carregar estado inicial
-    carregarEstadoSistema();
 }); 

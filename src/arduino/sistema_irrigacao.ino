@@ -7,13 +7,13 @@ const char* ssid = "Ti";           // Nome da sua rede WiFi (3G do celular)
 const char* password = "thi08012"; // Senha da sua rede WiFi
 
 // Configurações de IP Fixo para o ESP8266
-IPAddress staticIP(192, 168, 185, 208);    // IP fixo do ESP8266
-IPAddress gateway(192, 168, 185, 135);      // Gateway da sua rede
+IPAddress staticIP(192, 168, 249, 208);    // IP fixo do ESP8266
+IPAddress gateway(192, 168, 249, 27);      // Gateway da sua rede
 IPAddress subnet(255, 255, 255, 0);         // Máscara de sub-rede
 IPAddress dns(8, 8, 8, 8);                  // DNS do Google
 
 // Endereço do servidor
-const char* serverUrl = "http://192.168.185.207:5000"; // Seu servidor Node.js
+const char* serverUrl = "http://192.168.249.207:5000"; // Seu servidor Node.js
 
 // Pinos
 const int RELE_BOMBA = D1;        // Relé para controle da bomba d'água (GPIO5)

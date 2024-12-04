@@ -6,13 +6,12 @@ const {
   addProgramacao, 
   updateProgramacao,
   deleteProgramacao,
-  carregarTimersPadrao
+  carregarProgramacoesPadrao
 } = require('../controllers/programacaoController');
 
 router.get('/', auth, getProgramacao);
 router.post('/', auth, addProgramacao);
 router.put('/:id', auth, updateProgramacao);
 router.delete('/:id', auth, deleteProgramacao);
-router.post('/carregar-padrao', auth, carregarTimersPadrao);
 
 module.exports = router; 

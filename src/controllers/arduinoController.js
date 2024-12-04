@@ -5,6 +5,28 @@ const Programacao = require('../models/Programacao');
 
 exports.vincularArduino = async (req, res) => {
     try {
+        const { ip, porta } = req.body;
+
+        if (!ip || !porta) {
+            return res.status(400).json({ msg: 'IP e porta são obrigatórios' });
+        }
+
+        // Testar conexão antes de vincular
+        try {
+            const response = await axios.get(`http://${ip}:${porta}/status`, {
+                timeout: 5000 // timeout de 5 segundos
+            });
+
+            if (!response.data) {
+                throw new Error('Arduino não respondeu corretamente');
+            }
+        } catch (error) {
+            console.error('Erro ao testar conexão:', error);
+            return res.status(400).json({ 
+                msg: 'Não foi possível conectar ao Arduino. Verifique o IP e porta.'
+            });
+        }
+
         const connection = await pool.getConnection();
 
         try {
@@ -16,16 +38,22 @@ exports.vincularArduino = async (req, res) => {
                  ip = VALUES(ip), 
                  porta = VALUES(porta),
                  ultimo_status = 'online'`,
-                [req.user.id, '192.168.185.208', '80']
+                [req.user.id, ip, porta]
             );
 
-            res.json({ msg: 'Arduino vinculado com sucesso' });
+            res.json({ 
+                msg: 'Arduino vinculado com sucesso',
+                status: 'online'
+            });
         } finally {
             connection.release();
         }
     } catch (err) {
         console.error('Erro ao vincular Arduino:', err);
-        res.status(500).json({ msg: 'Erro ao vincular Arduino' });
+        res.status(500).json({ 
+            msg: 'Erro ao vincular Arduino',
+            error: err.message 
+        });
     }
 };
 
@@ -105,21 +133,33 @@ exports.irrigar = async (req, res) => {
         
         try {
             const [user] = await connection.execute(
-                'SELECT arduinoIp, arduinoPort FROM users WHERE id = ?',
+                'SELECT ac.ip, ac.porta FROM usuarios u ' +
+                'JOIN arduino_config ac ON u.id = ac.usuario_id ' +
+                'WHERE u.id = ?',
                 [req.user.id]
             );
 
-            if (!user[0].arduinoIp) {
+            if (!user[0]?.ip) {
                 return res.status(400).json({ msg: 'Arduino não vinculado' });
             }
 
-            const arduinoUrl = `http://${user[0].arduinoIp}:${user[0].arduinoPort}/irrigar`;
-            const response = await axios.post(arduinoUrl);
+            const arduinoUrl = `http://${user[0].ip}:${user[0].porta}/irrigar`;
             
-            // Salvar estado no MongoDB
-            await this.salvarEstadoRele(req.user.id, true);
-            
-            res.json(response.data);
+            try {
+                const response = await axios.post(arduinoUrl);
+                
+                // Salvar estado no MongoDB
+                await new RelayState({
+                    userId: req.user.id.toString(),
+                    estado: true,
+                    status: 'irrigando'
+                }).save();
+                
+                res.json({ msg: 'Irrigação iniciada com sucesso' });
+            } catch (error) {
+                console.error('Erro ao comunicar com Arduino:', error);
+                res.status(500).json({ msg: 'Erro ao comunicar com Arduino' });
+            }
         } finally {
             connection.release();
         }
@@ -135,21 +175,33 @@ exports.parar = async (req, res) => {
         
         try {
             const [user] = await connection.execute(
-                'SELECT arduinoIp, arduinoPort FROM users WHERE id = ?',
+                'SELECT ac.ip, ac.porta FROM usuarios u ' +
+                'JOIN arduino_config ac ON u.id = ac.usuario_id ' +
+                'WHERE u.id = ?',
                 [req.user.id]
             );
 
-            if (!user[0].arduinoIp) {
+            if (!user[0]?.ip) {
                 return res.status(400).json({ msg: 'Arduino não vinculado' });
             }
 
-            const arduinoUrl = `http://${user[0].arduinoIp}:${user[0].arduinoPort}/parar`;
-            const response = await axios.post(arduinoUrl);
+            const arduinoUrl = `http://${user[0].ip}:${user[0].porta}/parar`;
             
-            // Salvar estado no MongoDB
-            await this.salvarEstadoRele(req.user.id, false);
-            
-            res.json(response.data);
+            try {
+                const response = await axios.post(arduinoUrl);
+                
+                // Salvar estado no MongoDB
+                await new RelayState({
+                    userId: req.user.id.toString(),
+                    estado: false,
+                    status: 'online'
+                }).save();
+                
+                res.json({ msg: 'Irrigação parada com sucesso' });
+            } catch (error) {
+                console.error('Erro ao comunicar com Arduino:', error);
+                res.status(500).json({ msg: 'Erro ao comunicar com Arduino' });
+            }
         } finally {
             connection.release();
         }

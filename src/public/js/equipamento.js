@@ -165,6 +165,107 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Adicionar evento de submit ao formulário de configuração
+    if (configForm) {
+        configForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            try {
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Conectando...',
+                    text: 'Tentando estabelecer conexão com o Arduino',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const response = await fetch('/arduino/vincular', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': token
+                    },
+                    body: JSON.stringify({
+                        ip: document.getElementById('arduinoIp').value,
+                        porta: document.getElementById('arduinoPort').value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.msg || 'Erro ao vincular Arduino');
+                }
+
+                // Fechar loading e mostrar sucesso
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Conectado!',
+                    text: 'Arduino vinculado com sucesso',
+                    timer: 2000
+                });
+
+                // Atualizar interface
+                configForm.style.display = 'none';
+                btnTestar.style.display = 'none';
+                btnDesconectar.style.display = 'inline-block';
+                btnIrrigar.disabled = false;
+                btnPararIrrigacao.disabled = false;
+                updateConnectionStatus(true);
+                startDataUpdates();
+
+            } catch (error) {
+                console.error('Erro ao vincular Arduino:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: error.message || 'Erro ao vincular Arduino'
+                });
+            }
+        });
+    }
+
+    // Adicionar evento ao botão de teste
+    if (btnTestar) {
+        btnTestar.addEventListener('click', async () => {
+            try {
+                const ip = document.getElementById('arduinoIp').value;
+                const porta = document.getElementById('arduinoPort').value;
+
+                if (!ip || !porta) {
+                    throw new Error('Preencha o IP e a porta do Arduino');
+                }
+
+                Swal.fire({
+                    title: 'Testando conexão...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const response = await fetch(`http://${ip}:${porta}/status`);
+                const data = await response.json();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Teste bem sucedido!',
+                    text: 'Arduino respondeu corretamente'
+                });
+
+            } catch (error) {
+                console.error('Erro no teste:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro no teste',
+                    text: 'Não foi possível conectar ao Arduino'
+                });
+            }
+        });
+    }
+
     // Chamar verificação inicial
     await verificarArduinoVinculado();
 
