@@ -11,6 +11,7 @@ Sistema web integrado com Arduino para automação de irrigação em telhados ve
   <li>Mikelly Letran Plaça de Oliveira</li>
   <li>Micaella Letran Plaça de Oliveira</li>
   <li>José Victor Dias Rodrigues</li>
+  <li>Robert da Silva Rocha</li>
 </ul>
 
 ### Características Principais
