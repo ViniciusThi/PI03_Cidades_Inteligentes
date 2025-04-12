@@ -61,12 +61,13 @@ Sistema web integrado com Arduino para automação de irrigação em telhados ve
 5. Git: [Download](https://git-scm.com/)
 
 ### Hardware
-1. Arduino Mega 2560
-2. Ethernet Shield W5100
-3. Sensor de Umidade do Solo Capacitivo
-4. Módulo Relé 5V
-5. Fonte de alimentação 12V
-6. Jumpers e cabos de conexão
-7. Bomba d'água 12V
+1. 2X Modulo DHT22 
+2. Modulo Rele 1 canal 5V
+3. Sensor de fluxo de vazao de agua YF-S401 
+4. 2X Sensor de Umidade de solo capacitivo 
+5. Bomba de aquario HBO-300
+6. Tubo de plastico de 1/4 de polegada de diametro 
+7. Voltimetro Amperimetro Pzem-004t V3.0
+8. ESP32 NodeMCU 
 
 
