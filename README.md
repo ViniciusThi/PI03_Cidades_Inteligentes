@@ -44,12 +44,6 @@ Sistema web integrado com Arduino para automação de irrigação em telhados ve
 - SweetAlert2
 - Chart.js
 
-### Hardware
-- Arduino Mega
-- Módulo Ethernet Shield
-- Sensor de Umidade do Solo
-- Módulo Relé
-- Bomba d'água
 
 ## Pré-requisitos
 
