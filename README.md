@@ -1,7 +1,7 @@
 <h1 align="center">PI03 Cidades Inteligentes - Sistema de Irrigação Inteligente</h1>
 
 ## Descrição do Projeto
-Sistema web integrado com esp32 para automação de irrigação em telhados verdes. O sistema permite o monitoramento em tempo real da umidade do solo, controle manual e automático da irrigação, programação de horários e análise de consumo de água e energia.
+Sistema web integrado com ESP32 para automação de irrigação em telhados verdes. O sistema permite o monitoramento em tempo real da umidade do solo, controle manual e automático da irrigação, programação de horários e análise de consumo de água e energia.
 
 <p>Participantes:</p>
 <ul>
