@@ -158,7 +158,7 @@ exports.register = async (req, res) => {
                 const token = jwt.sign(
                     { user: { id: userResult.insertId } },
                     process.env.JWT_SECRET,
-                    { expiresIn: '5h' }
+                    { expiresIn: '30d' }
                 );
 
                 res.json({ token });
@@ -230,7 +230,7 @@ exports.login = async (req, res) => {
                     } 
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: '5h' }
+                { expiresIn: '30d' }
             );
 
             // Enviar resposta
@@ -246,5 +246,35 @@ exports.login = async (req, res) => {
     } catch (err) {
         console.error('Erro no login:', err);
         res.status(500).json({ msg: 'Erro no servidor' });
+    }
+};
+
+// Renovar token JWT
+exports.renewToken = async (req, res) => {
+    try {
+        // req.user já está disponível através do middleware auth
+        const userId = req.user.id;
+        const isAdmin = req.user.isAdmin;
+        
+        // Gerar novo token com 30 dias de validade
+        const token = jwt.sign(
+            { 
+                user: { 
+                    id: userId,
+                    isAdmin: isAdmin
+                } 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '30d' }
+        );
+        
+        res.json({ 
+            token,
+            isAdmin: isAdmin,
+            msg: 'Token renovado com sucesso'
+        });
+    } catch (err) {
+        console.error('Erro ao renovar token:', err);
+        res.status(500).json({ msg: 'Erro ao renovar token' });
     }
 }; 

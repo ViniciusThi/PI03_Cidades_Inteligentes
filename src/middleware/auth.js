@@ -33,6 +33,18 @@ module.exports = async function(req, res, next) {
         }
     } catch (err) {
         console.error('Token verification error:', err);
-        res.status(401).json({ msg: 'Token inválido' });
+        
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ 
+                msg: 'Token expirado', 
+                error: 'expired',
+                expiredAt: err.expiredAt
+            });
+        }
+        
+        res.status(401).json({ 
+            msg: 'Token inválido', 
+            error: err.name 
+        });
     }
 }; 

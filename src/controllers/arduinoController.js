@@ -2,10 +2,11 @@ const pool = require('../config/mysql');
 const axios = require('axios');
 const RelayState = require('../models/RelayState');
 const Programacao = require('../models/Programacao');
+const SensorData = require('../models/SensorData');
 
 exports.vincularArduino = async (req, res) => {
     try {
-        const { ip, porta } = req.body;
+        const { ip, porta, mac } = req.body;
 
         if (!ip || !porta) {
             return res.status(400).json({ msg: 'IP e porta são obrigatórios' });
@@ -30,15 +31,29 @@ exports.vincularArduino = async (req, res) => {
         const connection = await pool.getConnection();
 
         try {
+            // Verificar se a tabela possui a coluna mac_address
+            const [columns] = await connection.execute(
+                "SHOW COLUMNS FROM arduino_config LIKE 'mac_address'"
+            );
+            
+            // Se a coluna não existir, adicioná-la
+            if (columns.length === 0) {
+                await connection.execute(
+                    "ALTER TABLE arduino_config ADD COLUMN mac_address VARCHAR(20) NULL AFTER porta, ADD COLUMN last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+                );
+                console.log("Coluna mac_address adicionada à tabela arduino_config");
+            }
+
             // Inserir ou atualizar configuração do Arduino
             await connection.execute(
-                `INSERT INTO arduino_config (usuario_id, ip, porta, ultimo_status) 
-                 VALUES (?, ?, ?, 'online')
+                `INSERT INTO arduino_config (usuario_id, ip, porta, mac_address, ultimo_status) 
+                 VALUES (?, ?, ?, ?, 'online')
                  ON DUPLICATE KEY UPDATE 
                  ip = VALUES(ip), 
                  porta = VALUES(porta),
+                 mac_address = VALUES(mac_address),
                  ultimo_status = 'online'`,
-                [req.user.id, ip, porta]
+                [req.user.id, ip, porta, mac || null]
             );
 
             res.json({ 
@@ -374,5 +389,298 @@ exports.toggleSistemaAutomatico = async (req, res) => {
     } catch (err) {
         console.error('Erro ao atualizar sistema automático:', err);
         res.status(500).json({ msg: 'Erro ao atualizar sistema automático' });
+    }
+};
+
+// Função para atualizar o estado com dados do heartbeat
+exports.processarHeartbeat = async (data) => {
+    try {
+        // Buscar usuário associado ao MAC
+        const connection = await pool.getConnection();
+        let userId = null;
+        
+        try {
+            // Verificar se a tabela possui a coluna mac_address
+            const [columns] = await connection.execute(
+                "SHOW COLUMNS FROM arduino_config LIKE 'mac_address'"
+            );
+            
+            // Se a coluna não existir, adicioná-la
+            if (columns.length === 0) {
+                await connection.execute(
+                    "ALTER TABLE arduino_config ADD COLUMN mac_address VARCHAR(20) NULL AFTER porta, ADD COLUMN last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+                );
+                console.log("Coluna mac_address adicionada à tabela arduino_config");
+            }
+            
+            // Buscar por MAC address
+            if (data.mac) {
+                const [rows] = await connection.execute(
+                    'SELECT usuario_id FROM arduino_config WHERE mac_address = ?',
+                    [data.mac]
+                );
+                
+                if (rows.length > 0) {
+                    userId = rows[0].usuario_id;
+                }
+            }
+            
+            // Se não encontrou por MAC, buscar por IP
+            if (!userId && data.ip) {
+                const [rows] = await connection.execute(
+                    'SELECT usuario_id FROM arduino_config WHERE ip = ?',
+                    [data.ip]
+                );
+                
+                if (rows.length > 0) {
+                    userId = rows[0].usuario_id;
+                    
+                    // Atualizar o MAC se não estiver definido
+                    if (data.mac) {
+                        await connection.execute(
+                            'UPDATE arduino_config SET mac_address = ? WHERE usuario_id = ?',
+                            [data.mac, userId]
+                        );
+                    }
+                }
+            }
+        } finally {
+            connection.release();
+        }
+        
+        if (!userId) {
+            console.log('Nenhum usuário encontrado para o dispositivo');
+            return null;
+        }
+        
+        // Salvar dados dos sensores
+        if (data.temperatura !== undefined && data.umidade !== undefined && data.umidadeSolo !== undefined) {
+            const sensorData = new SensorData({
+                userId: userId.toString(),
+                deviceMac: data.mac || 'unknown',
+                temperatura: data.temperatura,
+                umidade: data.umidade,
+                umidadeSolo: data.umidadeSolo,
+                irrigacaoAtiva: data.irrigacao || false
+            });
+            
+            await sensorData.save();
+            
+            // Enviar dados em tempo real para os clientes
+            if (global.broadcastSensorData) {
+                global.broadcastSensorData({
+                    type: 'sensor_data',
+                    mac: data.mac || 'unknown',
+                    temperatura: data.temperatura,
+                    umidade: data.umidade,
+                    umidadeSolo: data.umidadeSolo,
+                    irrigacaoAtiva: data.irrigacao || false,
+                    automatico: data.automatico || false,
+                    userId: userId.toString()
+                });
+            }
+        }
+        
+        // Atualizar estado do relé
+        const ultimoEstado = await RelayState.findOne(
+            { userId: userId.toString() },
+            {},
+            { sort: { timestamp: -1 } }
+        );
+        
+        if (!ultimoEstado || 
+            ultimoEstado.estado !== (data.irrigacao || false) || 
+            ultimoEstado.sistemaAutomatico !== (data.automatico || false)) {
+            
+            const novoEstado = new RelayState({
+                userId: userId.toString(),
+                estado: data.irrigacao || false,
+                sistemaAutomatico: data.automatico || false,
+                status: (data.irrigacao || false) ? 'irrigando' : 'online'
+            });
+            
+            await novoEstado.save();
+            
+            // Notificar clientes da mudança de estado
+            if (global.broadcastArduinoState) {
+                global.broadcastArduinoState({
+                    type: 'estado',
+                    mac: data.mac || 'unknown',
+                    irrigacaoAtiva: data.irrigacao || false,
+                    automatico: data.automatico || false,
+                    status: (data.irrigacao || false) ? 'irrigando' : 'online',
+                    userId: userId.toString()
+                });
+            }
+        }
+        
+        return {
+            userId: userId.toString(),
+            mac: data.mac,
+            status: 'online'
+        };
+    } catch (err) {
+        console.error('Erro ao processar heartbeat:', err);
+        throw err;
+    }
+};
+
+// Buscar todos os dispositivos (para administradores)
+exports.getAllDevices = async (req, res) => {
+    try {
+        // Verificar se o usuário é administrador
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ msg: 'Acesso negado. Função exclusiva para administradores.' });
+        }
+
+        const connection = await pool.getConnection();
+        
+        try {
+            const [devices] = await connection.execute(
+                `SELECT ac.id, ac.usuario_id, u.nome, ac.ip, ac.porta, ac.mac_address, ac.ultimo_status, ac.last_update
+                 FROM arduino_config ac
+                 JOIN usuarios u ON ac.usuario_id = u.id
+                 ORDER BY ac.last_update DESC`
+            );
+            
+            // Para cada dispositivo, buscar o último estado
+            const devicesWithStatus = await Promise.all(devices.map(async (device) => {
+                const ultimoEstado = await RelayState.findOne(
+                    { userId: device.usuario_id.toString() },
+                    {},
+                    { sort: { timestamp: -1 } }
+                );
+                
+                return {
+                    ...device,
+                    estado: ultimoEstado ? ultimoEstado.estado : false,
+                    sistemaAutomatico: ultimoEstado ? ultimoEstado.sistemaAutomatico : false,
+                    status: ultimoEstado ? ultimoEstado.status : 'desconectado',
+                    ultimaAtualizacao: ultimoEstado ? ultimoEstado.timestamp : null
+                };
+            }));
+            
+            res.json(devicesWithStatus);
+        } finally {
+            connection.release();
+        }
+    } catch (err) {
+        console.error('Erro ao buscar dispositivos:', err);
+        res.status(500).json({ msg: 'Erro ao buscar dispositivos' });
+    }
+};
+
+// Vincular dispositivo a outro usuário (para administradores)
+exports.vincularDispositivoUsuario = async (req, res) => {
+    try {
+        // Verificar se o usuário é administrador
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ msg: 'Acesso negado. Função exclusiva para administradores.' });
+        }
+        
+        const { deviceId, userId } = req.body;
+        
+        if (!deviceId || !userId) {
+            return res.status(400).json({ msg: 'ID do dispositivo e ID do usuário são obrigatórios' });
+        }
+        
+        const connection = await pool.getConnection();
+        
+        try {
+            // Verificar se o usuário existe
+            const [user] = await connection.execute(
+                'SELECT id, nome FROM usuarios WHERE id = ?',
+                [userId]
+            );
+            
+            if (user.length === 0) {
+                return res.status(404).json({ msg: 'Usuário não encontrado' });
+            }
+            
+            // Verificar se o dispositivo existe
+            const [device] = await connection.execute(
+                'SELECT id, ip, porta, mac_address FROM arduino_config WHERE id = ?',
+                [deviceId]
+            );
+            
+            if (device.length === 0) {
+                return res.status(404).json({ msg: 'Dispositivo não encontrado' });
+            }
+            
+            // Vincular o dispositivo ao novo usuário
+            await connection.execute(
+                'UPDATE arduino_config SET usuario_id = ? WHERE id = ?',
+                [userId, deviceId]
+            );
+            
+            res.json({ 
+                msg: `Dispositivo vinculado com sucesso ao usuário ${user[0].nome}`,
+                usuario: {
+                    id: user[0].id,
+                    nome: user[0].nome
+                },
+                dispositivo: {
+                    id: device[0].id,
+                    ip: device[0].ip,
+                    porta: device[0].porta,
+                    mac: device[0].mac_address
+                }
+            });
+        } finally {
+            connection.release();
+        }
+    } catch (err) {
+        console.error('Erro ao vincular dispositivo:', err);
+        res.status(500).json({ msg: 'Erro ao vincular dispositivo' });
+    }
+};
+
+// Obter lista de dispositivos vinculados a um usuário
+exports.getDispositivosUsuario = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        const connection = await pool.getConnection();
+        
+        try {
+            const [devices] = await connection.execute(
+                `SELECT id, ip, porta, mac_address, ultimo_status, last_update
+                 FROM arduino_config
+                 WHERE usuario_id = ?
+                 ORDER BY last_update DESC`,
+                [userId]
+            );
+            
+            // Para cada dispositivo, buscar o último estado
+            const devicesWithStatus = await Promise.all(devices.map(async (device) => {
+                const ultimoEstado = await RelayState.findOne(
+                    { userId: userId.toString() },
+                    {},
+                    { sort: { timestamp: -1 } }
+                );
+                
+                // Verificar se o dispositivo está online (ativo nos últimos 5 minutos)
+                const cincoMinutosAtras = new Date();
+                cincoMinutosAtras.setMinutes(cincoMinutosAtras.getMinutes() - 5);
+                
+                const isOnline = device.last_update && new Date(device.last_update) > cincoMinutosAtras;
+                
+                return {
+                    ...device,
+                    estado: ultimoEstado ? ultimoEstado.estado : false,
+                    sistemaAutomatico: ultimoEstado ? ultimoEstado.sistemaAutomatico : false,
+                    status: isOnline ? (ultimoEstado ? ultimoEstado.status : 'online') : 'desconectado',
+                    ultimaAtualizacao: ultimoEstado ? ultimoEstado.timestamp : null,
+                    online: isOnline
+                };
+            }));
+            
+            res.json(devicesWithStatus);
+        } finally {
+            connection.release();
+        }
+    } catch (err) {
+        console.error('Erro ao buscar dispositivos do usuário:', err);
+        res.status(500).json({ msg: 'Erro ao buscar dispositivos' });
     }
 }; 
