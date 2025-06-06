@@ -63,4 +63,66 @@ Sistema web integrado com ESP32 para automação de irrigação em telhados verd
 7. Voltimetro Amperimetro Pzem-004t V3.0
 8. ESP32 NodeMCU 
 
+## Ligações Elétricas dos Componentes
+
+### ESP32 NodeMCU - Pinagem
+O ESP32 é o controlador central do sistema, abaixo estão os pinos utilizados para cada componente:
+
+| Componente | Pino ESP32 | Descrição |
+|------------|------------|-----------|
+| DHT22 (Temperatura/Umidade) | GPIO32 | Pino de dados do sensor |
+| Relé (Bomba d'água) | GPIO5 | Controle do relé |
+| Sensor de Umidade do Solo | GPIO34 (ADC) | Leitura analógica do sensor |
+| Sensor de Fluxo de Água | GPIO25 | Leitura de pulsos do sensor |
+| PZEM-004T V3 (Energia) | GPIO16 (RX2) e GPIO17 (TX2) | Comunicação serial |
+
+### Diagrama de Ligações
+
+#### DHT22 (Sensor de Temperatura e Umidade)
+- VCC: 3.3V do ESP32
+- GND: GND do ESP32
+- DATA: GPIO32 do ESP32
+
+#### Relé (Controle da Bomba)
+- VCC: 5V do ESP32 ou fonte externa 5V
+- GND: GND do ESP32
+- IN: GPIO5 do ESP32
+
+#### Sensor de Umidade do Solo Capacitivo
+- VCC: 3.3V do ESP32
+- GND: GND do ESP32
+- OUT (Analógico): GPIO34 do ESP32
+
+#### Sensor de Fluxo de Água YF-S401
+- VCC: 5V do ESP32
+- GND: GND do ESP32
+- Sinal (Pulsos): GPIO25 do ESP32
+
+#### PZEM-004T V3 (Sensor de Energia)
+- 5V: 5V do ESP32 (ou fonte externa)
+- GND: GND do ESP32
+- TX: GPIO16 (RX2) do ESP32
+- RX: GPIO17 (TX2) do ESP32
+
+**Atenção**: O PZEM-004T também deve ser conectado corretamente à rede elétrica para monitoramento. Siga as instruções do fabricante para conexão segura à rede elétrica.
+
+#### Bomba de Aquário HBO-300
+- Alimentação: Controlada pelo relé
+- Fase: Conectada ao contato normalmente aberto (NO) do relé
+- Neutro: Direto para a fonte de alimentação
+
+### Recomendações de Segurança
+1. **Sempre desconecte a alimentação antes de fazer qualquer alteração nas ligações.**
+2. **Use uma fonte de alimentação adequada para o ESP32 e para a bomba d'água.**
+3. **Isole adequadamente todas as conexões, especialmente aquelas próximas à água.**
+4. **Utilize diodos de proteção nos relés para evitar correntes de retorno ao ESP32.**
+5. **Para ligações em ambientes externos, use caixas à prova d'água para proteger os componentes eletrônicos.**
+
+### Alimentação do Sistema
+- ESP32: Alimentado via USB (5V) ou regulador de tensão externo
+- Bomba d'água: Fonte separada, controlada pelo relé (verifique a especificação da bomba)
+- Sensores: Alimentados diretamente pelo ESP32 (3.3V ou 5V conforme especificação)
+
+Para mais detalhes sobre a pinagem do ESP32, consulte a [documentação oficial](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html).
+
 
